@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">超絶スパイカメラくんPro</string>
+    <string name="app_name">フローティングカメラくんPro</string>
     <string name="sc_menu_gallery">ギャラリー</string>
     <string name="sc_menu_gallery_ng">ギャラリーを起動できません</string>
     <string name="sc_menu_setting">設定</string>
