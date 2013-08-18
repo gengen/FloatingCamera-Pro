@@ -67,6 +67,7 @@ public class FloatingCameraActivity extends Activity {
     public boolean isPinch = false;
     //ピンチが終了したときのフラグ
     private boolean mScaleEndFlag = false;
+    private boolean mAutoFlag = false;
     
     private ImageButton mButton = null;
     private ImageButton mFocusButton = null;
@@ -139,7 +140,11 @@ public class FloatingCameraActivity extends Activity {
         }
 
         //register UI Listener
-    	setListener();    	
+    	setListener();
+    	
+    	if(FloatingCameraPreference.isAutoShoot(this)){
+    		mAutoFlag = true;
+    	}
     }
     
     private void setListener(){
@@ -152,34 +157,10 @@ public class FloatingCameraActivity extends Activity {
             public void onClick(View v) {
                 if(mPreview != null){
                     if(mMode == 0){
-                        mPreview.resumeShooting();
-                        mMode = 1;
-                        //撮影中は他のボタンを見えなくする
-                        //mFocusButton.setVisibility(View.INVISIBLE);
-                        //mGalleryButton.setVisibility(View.INVISIBLE);
-                        //mSettingButton.setVisibility(View.INVISIBLE);
-                        mGalleryButton.setVisibility(View.GONE);
-                        mSettingButton.setVisibility(View.GONE);
-                        mText.setVisibility(View.VISIBLE);
-                        if(mPreview.isZoomSupported()){
-                            FrameLayout zoom = (FrameLayout)findViewById(R.id.zoom_layout);
-                            zoom.setVisibility(View.INVISIBLE);
-                        }
+                    	start();
                     }
                     else{
-                        mPreview.stopShooting();
-                        mMode = 0;
-                        //他のボタンを見えるようにする
-                        //mFocusButton.setVisibility(View.VISIBLE);
-                        mGalleryButton.setVisibility(View.VISIBLE);
-                        mSettingButton.setVisibility(View.VISIBLE);
-                        mCount = 0;
-                        mText.setText("0" + " ");
-                        mText.setVisibility(View.INVISIBLE);
-                        if(mPreview.isZoomSupported()){
-                            FrameLayout zoom = (FrameLayout)findViewById(R.id.zoom_layout);
-                            zoom.setVisibility(View.VISIBLE);
-                        }
+                    	stop();
                     }
                 }
             }
@@ -229,6 +210,38 @@ public class FloatingCameraActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
+    }
+    
+    void start(){
+        mPreview.resumeShooting();
+        mMode = 1;
+        //撮影中は他のボタンを見えなくする
+        //mFocusButton.setVisibility(View.INVISIBLE);
+        //mGalleryButton.setVisibility(View.INVISIBLE);
+        //mSettingButton.setVisibility(View.INVISIBLE);
+        mGalleryButton.setVisibility(View.GONE);
+        mSettingButton.setVisibility(View.GONE);
+        mText.setVisibility(View.VISIBLE);
+        if(mPreview.isZoomSupported()){
+            FrameLayout zoom = (FrameLayout)findViewById(R.id.zoom_layout);
+            zoom.setVisibility(View.INVISIBLE);
+        }    	
+    }
+    
+    void stop(){
+        mPreview.stopShooting();
+        mMode = 0;
+        //他のボタンを見えるようにする
+        //mFocusButton.setVisibility(View.VISIBLE);
+        mGalleryButton.setVisibility(View.VISIBLE);
+        mSettingButton.setVisibility(View.VISIBLE);
+        mCount = 0;
+        mText.setText("0" + " ");
+        mText.setVisibility(View.INVISIBLE);
+        if(mPreview.isZoomSupported()){
+            FrameLayout zoom = (FrameLayout)findViewById(R.id.zoom_layout);
+            zoom.setVisibility(View.VISIBLE);
+        }
     }
     
     /*
@@ -670,6 +683,14 @@ public class FloatingCameraActivity extends Activity {
     
     public void setMode(int mode){
         mMode = mode;
+    }
+    
+    void shootIfAuto(){
+    	//初回起動時かつ自動連写設定のときに連写
+    	if(mAutoFlag){
+    		start();
+    		mAutoFlag = false;
+    	}
     }
     
     protected void onPause(){
